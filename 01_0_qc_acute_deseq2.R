@@ -3,9 +3,6 @@
 # Acute QC
 #   1. Library size / Detected genes / lib vs detected
 #   2. VST PCA (AgeGroup × timepoint)
-#   3. Sample distance heatmap
-#   4. Baseline inflammatory ssGSEA (AgeGroup별 baseline 염증 활성)
-#   5. PCA shift distance (transcriptomic responsiveness)
 # =============================================================================
 suppressPackageStartupMessages({
   library(DESeq2)
@@ -19,7 +16,6 @@ suppressPackageStartupMessages({
 })
 
 source("/storage/home/csh91/lab2/RNAseq/RES_04_DrugMETH_cyno/final/final_fi/code_acute/00_utils.R")
-source("/storage/home/csh91/lab2/RNAseq/RES_04_DrugMETH_cyno/final/final_fi/code_acute/01_qc_plot_helpers.R")
 
 # -----------------------------------------------------------------------------
 # 경로 설정
@@ -101,23 +97,6 @@ p_pca <- ggplot(pca_df,
   theme_bw(base_size = 12)
 
 save_gg(p_pca, file.path(OUT_DIR, "04_vst_PCA.png"), w = 8, h = 6)
-
-# -----------------------------------------------------------------------------
-# 5. Sample distance heatmap
-# -----------------------------------------------------------------------------
-log_msg("Sample distance heatmap...")
-dist_mat <- as.matrix(dist(t(assay(vsd_acute))))
-ann_col  <- meta %>%
-  as.data.frame() %>%
-  dplyr::select(any_of(c("AgeGroup", "timepoint", "monkey")))
-rownames(ann_col) <- meta$sample_id
-
-pheatmap(dist_mat,
-         annotation_col = ann_col,
-         annotation_row = ann_col,
-         filename       = file.path(OUT_DIR, "05_sample_distance_heatmap.png"),
-         width = 9, height = 9)
-
 
 
 
